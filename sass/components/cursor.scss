@@ -1,0 +1,37 @@
+.cursor{
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  contain: layout style size;
+  pointer-events: none;
+
+  &:before{
+    content: "";
+    width: 48px;
+    height: 48px;
+    top: -24px;
+    left: -24px;
+    position: absolute;
+    background: black;
+    display: block;
+    border-radius: 48px;
+  }
+
+  .cursor-media{
+    display: block;
+    height: 350px;
+    width: 350px;
+    overflow: hidden;
+    border-radius: 100%;
+    transform: scale(0);
+    margin: -175px 0 0 -175px;
+
+    video{
+      height: 350px;
+      left: 50%;
+      transform: translateX(-50%);
+      position: absolute;
+    }
+  }
+}
