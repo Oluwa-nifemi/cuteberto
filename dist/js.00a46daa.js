@@ -5762,9 +5762,6 @@ var mouse = {
   x: 0,
   y: 0
 };
-window.addEventListener("mousemove", function (e) {
-  return mouse = (0, _utils.getMousePos)(e);
-});
 
 var Cursor = /*#__PURE__*/function () {
   function Cursor(el) {
@@ -5773,10 +5770,26 @@ var Cursor = /*#__PURE__*/function () {
     _classCallCheck(this, Cursor);
 
     this.Cursor = el;
-    this.Cursor.style.opacity = 0;
+    this.Cursor.style.opacity = 0; //Elements
+
     this.Items = document.querySelectorAll('.hero-inner-link-item');
     this.Hero = document.querySelector('.hero-inner');
-    this.Videos = document.querySelectorAll('.cursor-media video');
+    this.Hamburger = document.querySelector('.header-inner-nav-menu-hamburger');
+    var burgerPosition = this.Hamburger.getBoundingClientRect();
+    this.HamburgerCenter = {
+      x: burgerPosition.x + burgerPosition.width / 2,
+      y: burgerPosition.y + burgerPosition.height / 2
+    };
+    this.HamburgerPosition = {
+      x: {
+        previous: 0,
+        current: 0
+      },
+      y: {
+        previous: 0,
+        current: 0
+      }
+    };
     var speed = 0.2;
     this.cursorConfigs = {
       x: {
@@ -5803,12 +5816,48 @@ var Cursor = /*#__PURE__*/function () {
 
       _this.onScaleMouse();
 
+      _this.onHoverBurger();
+
       requestAnimationFrame(function () {
         return _this.render();
       });
       window.removeEventListener("mousemove", _this.onMouseMoveEv);
     };
 
+    window.addEventListener("mousemove", function (e) {
+      //If we're not being magnetic just set the correct mouse position
+      if (!_this.magnetic) {
+        mouse = (0, _utils.getMousePos)(e);
+      } else {
+        var mousePosition = (0, _utils.getMousePos)(e); //Distance between mouse and hamburger center
+
+        var distX = mousePosition.x - _this.HamburgerCenter.x;
+        var distY = mousePosition.y - _this.HamburgerCenter.y;
+        var threshold = 140; //If we're more than 140px away from the center either horizontally or vertically
+        // return to normal mouse position and style burger back
+
+        if (Math.abs(distX) > threshold || Math.abs(distY) > threshold) {
+          _this.magnetic = false;
+
+          _this.Cursor.style.setProperty('--scale', 1);
+
+          _this.Hamburger.classList.remove('white-lines');
+
+          _this.HamburgerPosition.x.current = 0;
+          _this.HamburgerPosition.y.current = 0;
+        } else {
+          //Else calculate the percentage distance relative to the threshold then over a 15px range and move the mouse to there
+          mouse.x = distX / threshold * 15 + _this.HamburgerCenter.x;
+          mouse.y = distY / threshold * 15 + _this.HamburgerCenter.y; //Also position the hamburger for 12px and render the burger
+
+          _this.HamburgerPosition.x.current = distX / threshold * 12;
+          _this.HamburgerPosition.y.current = distY / threshold * 12;
+          requestAnimationFrame(function () {
+            return _this.renderBurger();
+          });
+        }
+      }
+    });
     window.addEventListener("mousemove", this.onMouseMoveEv);
   }
 
@@ -5829,46 +5878,67 @@ var Cursor = /*#__PURE__*/function () {
       requestAnimationFrame(function () {
         return _this2.render();
       });
+    }
+  }, {
+    key: "renderBurger",
+    value: function renderBurger() {
+      var _this3 = this;
+
+      //If the current is 0 (meaning we're resetting burger back to it's position and the position we're at is basically negligible then just cancel the animation frame
+      if (this.HamburgerPosition.x.current === 0 && Math.abs(this.HamburgerPosition.x.previous) < 0.001) {
+        cancelAnimationFrame(this.burgerRaf);
+        return;
+      } //Else linear interpolate and position
+
+
+      for (var key in this.HamburgerPosition) {
+        this.HamburgerPosition[key].previous = (0, _utils.lerp)(this.HamburgerPosition[key].previous, this.HamburgerPosition[key].current, 0.2);
+      }
+
+      this.Hamburger.style.transform = "translateX(".concat(this.HamburgerPosition.x.previous, "px) translateY(").concat(this.HamburgerPosition.y.previous, "px)");
+      this.burgerRaf = requestAnimationFrame(function () {
+        return _this3.renderBurger();
+      });
     } //Scale the mouse up on link hover
 
   }, {
     key: "onScaleMouse",
     value: function onScaleMouse() {
-      var _this3 = this;
+      var _this4 = this;
 
-      this.Items.forEach(function (link, idx) {
+      this.Items.forEach(function (link) {
         if (link.matches(':hover')) {
-          _this3.scaleAnimation( //The cursor-media element
-          _this3.Cursor.children[0], 0.6);
+          _this4.scaleAnimation( //The cursor-media element
+          _this4.Cursor.children[0], 0.6);
 
-          _this3.activateVideo(link);
+          _this4.activateVideo(link);
         } //Scale up by 0.8 on mouse enter
 
 
         link.addEventListener("mouseenter", function () {
-          _this3.scaleAnimation( //The cursor-media element
-          _this3.Cursor.children[0], 0.6);
+          _this4.scaleAnimation( //The cursor-media element
+          _this4.Cursor.children[0], 0.6);
 
-          _this3.activateVideo(link);
+          _this4.activateVideo(link);
         }); //Scale back down on mouse leave
 
         link.addEventListener("mouseleave", function () {
-          _this3.scaleAnimation( //The cursor-media element
-          _this3.Cursor.children[0], 0);
+          _this4.scaleAnimation( //The cursor-media element
+          _this4.Cursor.children[0], 0);
         }); //Scale up to 1.2 when hover over actual content
 
         link.children[1].addEventListener("mouseenter", function () {
-          _this3.Cursor.classList.add("media-blend");
+          _this4.Cursor.classList.add("media-blend");
 
-          _this3.scaleAnimation( //The cursor-media element
-          _this3.Cursor.children[0], 1);
+          _this4.scaleAnimation( //The cursor-media element
+          _this4.Cursor.children[0], 1);
         }); //Scale back down when leave
 
         link.children[1].addEventListener("mouseleave", function () {
-          _this3.Cursor.classList.remove("media-blend");
+          _this4.Cursor.classList.remove("media-blend");
 
-          _this3.scaleAnimation( //The cursor-media element
-          _this3.Cursor.children[0], 0.6);
+          _this4.scaleAnimation( //The cursor-media element
+          _this4.Cursor.children[0], 0.6);
         });
       });
       this.currentScale = (0, _utils.lerp)(this.currentScale, 20, 0.2);
@@ -5877,15 +5947,14 @@ var Cursor = /*#__PURE__*/function () {
   }, {
     key: "activateVideo",
     value: function activateVideo(el) {
-      var _this4 = this;
+      var _this5 = this;
 
       var id = el.getAttribute('data-video-src');
       var video = document.getElementById(id);
-      console.log(video, el);
       var siblings = (0, _utils.getSiblings)(video);
       this.setOpacity(video, 1);
       siblings.forEach(function (item) {
-        return _this4.setOpacity(item, 0);
+        return _this5.setOpacity(item, 0);
       });
     } //Opacity Animation
 
@@ -5905,6 +5974,26 @@ var Cursor = /*#__PURE__*/function () {
         scale: amt,
         ease: "Power3.easeout"
       });
+    } //On Hover Burger
+
+  }, {
+    key: "onHoverBurger",
+    value: function onHoverBurger() {
+      var _this6 = this;
+
+      var burgerMove = function burgerMove() {
+        //If we hover the burger's surroundings snap up the cursor and scale it up and show the spans
+        mouse.x = _this6.HamburgerCenter.x;
+        mouse.y = _this6.HamburgerCenter.y;
+
+        _this6.Cursor.style.setProperty('--scale', 7);
+
+        _this6.Hamburger.classList.add('white-lines');
+
+        _this6.magnetic = true;
+      };
+
+      this.Hamburger.addEventListener('mouseenter', burgerMove);
     }
   }]);
 
