@@ -8,7 +8,13 @@ window.onload = () => {
 
   body.classList.remove('loading')
 
-  const tl = gsap.timeline();
+  const tl = gsap.timeline({
+    onComplete: () => {
+      [...document.querySelectorAll('.hero-inner-link-item')].forEach(link => {
+        link.style.overflow = 'visible'
+      })
+    }
+  });
 
   tl.from(body, {
     opacity: 0,
