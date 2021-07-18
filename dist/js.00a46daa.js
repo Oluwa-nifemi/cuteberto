@@ -5776,6 +5776,7 @@ var Cursor = /*#__PURE__*/function () {
     this.Cursor.style.opacity = 0;
     this.Items = document.querySelectorAll('.hero-inner-link-item');
     this.Hero = document.querySelector('.hero-inner');
+    this.Videos = document.querySelectorAll('.cursor-media video');
     var speed = 0.2;
     this.cursorConfigs = {
       x: {
@@ -5790,7 +5791,7 @@ var Cursor = /*#__PURE__*/function () {
       }
     }; //Define mouse move function
 
-    this.onMouseMoveEv = function () {
+    this.onMouseMoveEv = function (e) {
       _this.cursorConfigs.x.previous = _this.cursorConfigs.x.current = mouse.x;
       _this.cursorConfigs.y.previous = _this.cursorConfigs.y.current = mouse.y;
 
@@ -5799,6 +5800,8 @@ var Cursor = /*#__PURE__*/function () {
         ease: "Power3.easeOut",
         opacity: 1
       });
+
+      _this.onScaleMouse();
 
       requestAnimationFrame(function () {
         return _this.render();
@@ -5819,11 +5822,88 @@ var Cursor = /*#__PURE__*/function () {
 
       for (var key in this.cursorConfigs) {
         this.cursorConfigs[key].previous = (0, _utils.lerp)(this.cursorConfigs[key].previous, this.cursorConfigs[key].current, this.cursorConfigs[key].amt);
-      }
+      } //Move cursor to calculated position
+
 
       this.Cursor.style.transform = "translateX(".concat(this.cursorConfigs.x.previous, "px) translateY(").concat(this.cursorConfigs.y.previous, "px)");
       requestAnimationFrame(function () {
         return _this2.render();
+      });
+    } //Scale the mouse up on link hover
+
+  }, {
+    key: "onScaleMouse",
+    value: function onScaleMouse() {
+      var _this3 = this;
+
+      this.Items.forEach(function (link, idx) {
+        if (link.matches(':hover')) {
+          _this3.scaleAnimation( //The cursor-media element
+          _this3.Cursor.children[0], 0.6);
+
+          _this3.activateVideo(link);
+        } //Scale up by 0.8 on mouse enter
+
+
+        link.addEventListener("mouseenter", function () {
+          _this3.scaleAnimation( //The cursor-media element
+          _this3.Cursor.children[0], 0.6);
+
+          _this3.activateVideo(link);
+        }); //Scale back down on mouse leave
+
+        link.addEventListener("mouseleave", function () {
+          _this3.scaleAnimation( //The cursor-media element
+          _this3.Cursor.children[0], 0);
+        }); //Scale up to 1.2 when hover over actual content
+
+        link.children[1].addEventListener("mouseenter", function () {
+          _this3.Cursor.classList.add("media-blend");
+
+          _this3.scaleAnimation( //The cursor-media element
+          _this3.Cursor.children[0], 1);
+        }); //Scale back down when leave
+
+        link.children[1].addEventListener("mouseleave", function () {
+          _this3.Cursor.classList.remove("media-blend");
+
+          _this3.scaleAnimation( //The cursor-media element
+          _this3.Cursor.children[0], 0.6);
+        });
+      });
+      this.currentScale = (0, _utils.lerp)(this.currentScale, 20, 0.2);
+      this.Cursor.style.transform = "translateX(".concat(this.cursorConfigs.x.previous, "px) translateY(").concat(this.cursorConfigs.y.previous, "px) scale(").concat(this.currentScale, ")");
+    }
+  }, {
+    key: "activateVideo",
+    value: function activateVideo(el) {
+      var _this4 = this;
+
+      var id = el.getAttribute('data-video-src');
+      var video = document.getElementById(id);
+      console.log(video, el);
+      var siblings = (0, _utils.getSiblings)(video);
+      this.setOpacity(video, 1);
+      siblings.forEach(function (item) {
+        return _this4.setOpacity(item, 0);
+      });
+    } //Opacity Animation
+
+  }, {
+    key: "setOpacity",
+    value: function setOpacity(el, opacity) {
+      _gsap.gsap.set(el, {
+        opacity: opacity
+      });
+    } //Scale animation
+
+  }, {
+    key: "scaleAnimation",
+    value: function scaleAnimation(el, amt) {
+      _gsap.gsap.to(el, {
+        duration: 0.6,
+        scale: amt,
+        ease: "Power3.easeout"
       });
     }
   }]);
@@ -5837,13 +5917,23 @@ exports.default = Cursor;
 
 var _cursor = _interopRequireDefault(require("./cursor"));
 
+var _gsap = require("gsap");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+var body = document.querySelector('body');
+
 window.onload = function () {
-  console.log("hey there cutie ;)");
-  var cursor = new _cursor.default(document.querySelector('.cursor'));
+  new _cursor.default(document.querySelector('.cursor'));
+  body.classList.remove('loading');
+
+  _gsap.gsap.from(body, {
+    opacity: 0,
+    duration: 1,
+    ease: "Power3.easeInOut"
+  });
 };
-},{"./cursor":"js/cursor.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./cursor":"js/cursor.js","gsap":"node_modules/gsap/index.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -5871,7 +5961,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "52288" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "62896" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

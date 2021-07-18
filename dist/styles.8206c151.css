@@ -165,16 +165,24 @@ header .header-inner .header-inner-col .header-inner-nav .header-inner-nav-menu 
   contain: layout style size;
   pointer-events: none;
 }
+.cursor.media-blend {
+  z-index: 100;
+  mix-blend-mode: exclusion;
+}
+.cursor.media-blend .cursor-media {
+  filter: invert(1);
+}
 .cursor:before {
   content: "";
-  width: 48px;
-  height: 48px;
-  top: -24px;
-  left: -24px;
+  --radius: 4px;
+  width: calc(var(--radius) * 2);
+  height: calc(var(--radius) * 2);
+  top: calc(-1 * var(--radius));
+  left: calc(-1 * var(--radius));
   position: absolute;
   background: black;
   display: block;
-  border-radius: 48px;
+  border-radius: 50%;
 }
 .cursor .cursor-media {
   display: block;
@@ -206,6 +214,10 @@ body {
   color: #000;
   background: #fff;
   font-size: 16px;
+}
+
+.loading {
+  visibility: hidden;
 }
 
 .chat {

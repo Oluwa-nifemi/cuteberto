@@ -1,7 +1,15 @@
 import Cursor from "./cursor";
+import {gsap} from "gsap";
+
+const body = document.querySelector('body');
 
 window.onload = () => {
-  console.log("hey there cutie ;)");
-  const cursor = new Cursor(document.querySelector('.cursor'))
+  new Cursor(document.querySelector('.cursor'))
 
+  body.classList.remove('loading')
+  gsap.from(body, {
+    opacity: 0,
+    duration: 1,
+    ease: "Power3.easeInOut"
+  })
 };
