@@ -38,6 +38,8 @@
         .hero-inner-title {
           z-index: 11;
           position: relative;
+          overflow: hidden;
+
           h1 {
             margin: 0;
 
@@ -52,6 +54,7 @@
           position: relative;
           display: flex;
           .hero-inner-link-item {
+            overflow: hidden;
             .hero-inner-link-item-padding {
               position: relative;
               &:before {

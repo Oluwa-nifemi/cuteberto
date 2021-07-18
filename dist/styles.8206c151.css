@@ -113,6 +113,7 @@ header .header-inner .header-inner-col .header-inner-nav .header-inner-nav-menu 
 .hero .container .hero-inner .hero-inner-col .hero-inner-title {
   z-index: 11;
   position: relative;
+  overflow: hidden;
 }
 .hero .container .hero-inner .hero-inner-col .hero-inner-title h1 {
   margin: 0;
@@ -127,6 +128,9 @@ header .header-inner .header-inner-col .header-inner-nav .header-inner-nav-menu 
   z-index: 11;
   position: relative;
   display: flex;
+}
+.hero .container .hero-inner .hero-inner-col .hero-inner-links .hero-inner-link-item {
+  overflow: hidden;
 }
 .hero .container .hero-inner .hero-inner-col .hero-inner-links .hero-inner-link-item .hero-inner-link-item-padding {
   position: relative;
