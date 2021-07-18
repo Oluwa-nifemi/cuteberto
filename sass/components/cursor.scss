@@ -5,6 +5,7 @@
   z-index: 10;
   contain: layout style size;
   pointer-events: none;
+  --scale: 1;
 
   &.media-blend{
     z-index: 100;
@@ -14,7 +15,13 @@
     }
   }
 
-  --scale: 1;
+  &.show-reel-blend{
+    z-index: 100;
+    mix-blend-mode: exclusion;
+    &:before{
+      background-color: white;
+    }
+  }
 
   &:before{
     content: "";

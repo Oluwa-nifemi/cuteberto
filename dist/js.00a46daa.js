@@ -5775,6 +5775,7 @@ var Cursor = /*#__PURE__*/function () {
     this.Items = document.querySelectorAll('.hero-inner-link-item');
     this.Hero = document.querySelector('.hero-inner');
     this.Hamburger = document.querySelector('.header-inner-nav-menu-hamburger');
+    this.ShowReelLink = document.querySelector('.show-reel-link');
     var burgerPosition = this.Hamburger.getBoundingClientRect();
     this.HamburgerCenter = {
       x: burgerPosition.x + burgerPosition.width / 2,
@@ -5817,6 +5818,8 @@ var Cursor = /*#__PURE__*/function () {
       _this.onScaleMouse();
 
       _this.onHoverBurger();
+
+      _this.onHoverShowreel();
 
       requestAnimationFrame(function () {
         return _this.render();
@@ -5974,8 +5977,7 @@ var Cursor = /*#__PURE__*/function () {
         scale: amt,
         ease: "Power3.easeout"
       });
-    } //On Hover Burger
-
+    }
   }, {
     key: "onHoverBurger",
     value: function onHoverBurger() {
@@ -5994,6 +5996,22 @@ var Cursor = /*#__PURE__*/function () {
       };
 
       this.Hamburger.addEventListener('mouseenter', burgerMove);
+    }
+  }, {
+    key: "onHoverShowreel",
+    value: function onHoverShowreel() {
+      var _this7 = this;
+
+      this.ShowReelLink.addEventListener("mouseenter", function () {
+        _this7.Cursor.style.setProperty('--scale', 7);
+
+        _this7.Cursor.classList.add('show-reel-blend');
+      });
+      this.ShowReelLink.addEventListener("mouseleave", function () {
+        _this7.Cursor.style.setProperty('--scale', 1);
+
+        _this7.Cursor.classList.remove('show-reel-blend');
+      });
     }
   }]);
 

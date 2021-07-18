@@ -12,6 +12,7 @@ export default class Cursor {
         this.Items = document.querySelectorAll('.hero-inner-link-item');
         this.Hero = document.querySelector('.hero-inner');
         this.Hamburger = document.querySelector('.header-inner-nav-menu-hamburger');
+        this.ShowReelLink = document.querySelector('.show-reel-link');
 
         const burgerPosition = this.Hamburger.getBoundingClientRect();
         this.HamburgerCenter = {
@@ -52,6 +53,7 @@ export default class Cursor {
 
             this.onScaleMouse();
             this.onHoverBurger();
+            this.onHoverShowreel();
 
             requestAnimationFrame(() => this.render())
 
@@ -225,7 +227,6 @@ export default class Cursor {
         )
     }
 
-    //On Hover Burger
     onHoverBurger() {
         const burgerMove = () => {
             //If we hover the burger's surroundings snap up the cursor and scale it up and show the spans
@@ -237,5 +238,17 @@ export default class Cursor {
         };
 
         this.Hamburger.addEventListener('mouseenter', burgerMove)
+    }
+
+    onHoverShowreel(){
+        this.ShowReelLink.addEventListener("mouseenter", () => {
+            this.Cursor.style.setProperty('--scale', 7);
+            this.Cursor.classList.add('show-reel-blend')
+        })
+
+        this.ShowReelLink.addEventListener("mouseleave", () => {
+            this.Cursor.style.setProperty('--scale', 1);
+            this.Cursor.classList.remove('show-reel-blend')
+        })
     }
 }
