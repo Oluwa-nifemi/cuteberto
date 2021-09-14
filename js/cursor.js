@@ -96,16 +96,27 @@ export default class Cursor {
     }
 
     render(){
+        const cursorMedia = this.Cursor.children[0];
+
         this.cursorConfigs.x.current = mouse.x;
         this.cursorConfigs.y.current = mouse.y;
 
+        const differences = [];
         for (const key in this.cursorConfigs) {
+            differences.push(this.cursorConfigs[key].previous - this.cursorConfigs[key].current)
+
             this.cursorConfigs[key].previous = lerp(
                 this.cursorConfigs[key].previous,
                 this.cursorConfigs[key].current,
                 this.cursorConfigs[key].amt,
             )
         }
+
+        this.scaleAnimation(
+            cursorMedia,
+            this.cursorMediaScale,
+            differences.some(difference => difference > 20)
+        )
 
         //Move cursor to calculated position
         this.Cursor.style.transform = `translateX(${this.cursorConfigs.x.previous}px) translateY(${this.cursorConfigs.y.previous}px)`
@@ -136,11 +147,15 @@ export default class Cursor {
 
     //Scale the mouse up on link hover
     onScaleMouse() {
+        const cursorMedia = this.Cursor.children[0];
+
         this.Items.forEach((link) => {
             if (link.matches(':hover')) {
+                this.cursorMediaScale = 0.6;
+
                 this.scaleAnimation(
                     //The cursor-media element
-                    this.Cursor.children[0],
+                    cursorMedia,
                     0.6
                 )
 
@@ -149,9 +164,11 @@ export default class Cursor {
 
             //Scale up by 0.8 on mouse enter
             link.addEventListener("mouseenter", () => {
+                this.cursorMediaScale = 0.6;
+
                 this.scaleAnimation(
                     //The cursor-media element
-                    this.Cursor.children[0],
+                    cursorMedia,
                     0.6
                 )
 
@@ -160,9 +177,11 @@ export default class Cursor {
 
             //Scale back down on mouse leave
             link.addEventListener("mouseleave", () => {
+                this.cursorMediaScale = 0;
+
                 this.scaleAnimation(
                     //The cursor-media element
-                    this.Cursor.children[0],
+                    cursorMedia,
                     0
                 )
             })
@@ -170,9 +189,11 @@ export default class Cursor {
             //Scale up to 1.2 when hover over actual content
             link.children[1].addEventListener("mouseenter", () => {
                 this.Cursor.classList.add("media-blend")
+                this.cursorMediaScale = 1;
+
                 this.scaleAnimation(
                     //The cursor-media element
-                    this.Cursor.children[0],
+                    cursorMedia,
                     1
                 )
             })
@@ -180,21 +201,15 @@ export default class Cursor {
             //Scale back down when leave
             link.children[1].addEventListener("mouseleave", () => {
                 this.Cursor.classList.remove("media-blend")
+                this.cursorMediaScale = 1;
+
                 this.scaleAnimation(
                     //The cursor-media element
-                    this.Cursor.children[0],
+                    cursorMedia,
                     0.6
                 )
             })
         })
-
-        this.currentScale = lerp(
-            this.currentScale,
-            20,
-            0.2
-        )
-
-        this.Cursor.style.transform = `translateX(${this.cursorConfigs.x.previous}px) translateY(${this.cursorConfigs.y.previous}px) scale(${this.currentScale})`
     }
 
     activateVideo(el) {
@@ -216,11 +231,13 @@ export default class Cursor {
     }
 
     //Scale animation
-    scaleAnimation(el, amt) {
+    scaleAnimation(el, amt, skew = false) {
         gsap.to(
             el,
             {
                 duration: 0.6,
+                scaleX: skew ? amt + 0.3 : amt,
+                scaleY: amt,
                 scale: amt,
                 ease: "Power3.easeout"
             }
